@@ -1,6 +1,6 @@
 {% if not interface.is_virtual %}
 interface {{ interface.name }}
-    {{ "description %s" % interface.description if interface.description eq '' }}
+    {{ "description %s" % interface.description if interface.description == '' }}
     {{ "shutdown" if not interface.enabled }}
     {{ "vrf forwarding %s" % interface.vrf.name if interface.vrf is defined }}
     {{ "no switchport" if interface.count_ipaddresses > 0 }}
