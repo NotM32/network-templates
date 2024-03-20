@@ -1,15 +1,14 @@
-{% if not interface.is_virtual or interface.is_lag %}
+{%- if not interface.is_virtual or interface.is_lag -%}
 interface {{ interface.name }}
     {{ "description %s" % interface.description if interface.description != '' }}
     {{ "shutdown" if not interface.enabled }}
     {{ "vrf forwarding %s" % interface.vrf.name if interface.vrf is not none }}
     {{ "no switchport" if interface.count_ipaddresses > 0 }}
     {{ "ipv6 enable" if interface.count_ipaddresses > 0 }}
-    {%- for ip in interface.ip_addresses.all() %}
+    {%- for ip in interface.ip_addresses.all() -%}
     ip{{ "v6" if ip.family == 6 }} address {{ ip.address }}
-    {% endfor %}
-    {%- if interface.lag is not none %}
+    {% endfor -%}
+    {%- if interface.lag is not none -%}
     channel-group {{ interface.lag.label }} mode active
-    {% endif %}
-
-!{% endif %}
+    {%- endif -%}
+!{%- endif -%}
