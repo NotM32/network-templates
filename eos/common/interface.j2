@@ -2,7 +2,7 @@
 interface {{ interface.name }}
     {{ "description %s" % interface.description if interface.description != '' }}
     {{ "shutdown" if not interface.enabled }}
-    {{ "vrf forwarding %s" % interface.vrf.name if interface.vrf is not None }}
+    {{ "vrf forwarding %s" % interface.vrf.name if interface.vrf is not none }}
     {{ "no switchport" if interface.count_ipaddresses > 0 }}
     {{ "ipv6 enable" if interface.count_ipaddresses > 0 }}
     {%- for ip in interface.ip_addresses.all() %}
