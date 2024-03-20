@@ -4,7 +4,7 @@ lldp management-address vrf mgmt
 hostname {{ device.name }}
 ip domain-name coloradocolo.net
 !
-{%- for server in ntp_servers -%}
+{%- for server in ntp_servers %}
 ntp {{ server }}
 {%- endfor -%}
 !
