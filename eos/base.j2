@@ -5,9 +5,10 @@ hostname {{ device.name }}
 ip domain-name coloradocolo.net
 !
 {% for server in ntp_servers %}
-ntp {{ server }};
+ntp {{ server }}
 {% endfor %}
 !
+snmp-server community ***REMOVED*** ro SNMP
 !
 spanning-tree mode mstp
 !
@@ -26,7 +27,7 @@ vrf definition mgmt
 
 {% block interfaces %}
 {% for interface in device.interfaces.all() %}
-{% include 'interface.j2' %}
+{% include 'common/interface.j2' %}
 {% endfor %}
 {%endblock%}
 
