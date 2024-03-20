@@ -4,7 +4,7 @@ lldp management-address vrf mgmt
 hostname {{ device.name }}
 ip domain-name coloradocolo.net
 !
-{% for server in ntp_servers %}
+{%- for server in ntp_servers %}
 ntp {{ server }}
 {% endfor %}
 !
@@ -24,13 +24,11 @@ vrf definition mgmt
     rd 100:100
     description mgmt
 !
-
 {% block interfaces %}
 {% for interface in device.interfaces.all() %}
 {% include 'eos/common/interface.j2' %}
-{% endfor %}
+{%- endfor %}
 {%endblock%}
-
 ip access-list standard SNMP
    10 permit host ***REMOVED***
    20 permit ***REMOVED***
