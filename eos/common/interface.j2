@@ -1,4 +1,4 @@
-{% if not interface.is_virtual %}
+{% if not interface.is_virtual or interface.is_lag %}
 interface {{ interface.name }}
     {{ "description %s" % interface.description if interface.description != '' }}
     {{ "shutdown" if not interface.enabled }}
@@ -8,5 +8,8 @@ interface {{ interface.name }}
     {%- for ip in interface.ip_addresses.all() %}
     ip{{ "v6" if ip.family == 6 }} address {{ ip.address }}
     {% endfor %}
+    {%- if interface.lag is not none %}
+    channel-group {{ interface.lag.label }} mode active
+    {% endif %}
 
 !{% endif %}
