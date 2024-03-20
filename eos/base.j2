@@ -1,0 +1,69 @@
+lldp management-address Management1
+lldp management-address vrf mgmt
+!
+hostname {{ device.name }}
+ip domain-name coloradocolo.net
+!
+{% for server in ntp_servers %}
+ntp {{ server }};
+{% endfor %}
+!
+!
+spanning-tree mode mstp
+!
+service unsupported-transceiver EMC ***REMOVED***
+!
+aaa authorization exec default local
+!
+no aaa root
+!
+clock timezone US/Mountain
+!
+vrf definition mgmt
+    rd 100:100
+    description mgmt
+!
+
+{% block interfaces %}
+{% for interface in device.interfaces.all() %}
+{% include 'interface.j2' %}
+{% endfor %}
+{%endblock%}
+
+ip access-list standard SNMP
+   10 permit host ***REMOVED***
+   20 permit ***REMOVED***
+   30 permit host ***REMOVED***
+   40 permit host ***REMOVED***
+!
+ip access-list standard mgmt
+   10 permit 172.16.2.0/24
+   20 remark Office
+   30 permit 172.16.1.0/24
+   40 remark VPN Clients
+   50 permit host ***REMOVED***
+   60 remark Bastion/Firewall
+   70 permit ***REMOVED***
+   80 remark Infrastructure Servers
+   90 permit host ***REMOVED***
+   100 remark netbox
+!
+management api http-commands
+   no shutdown
+   vrf mgmt
+      no shutdown
+!
+management ssh
+   ip access-group mgmt vrf mgmt in
+   idle-timeout 30
+   login timeout 10
+   vrf mgmt
+      no shutdown
+!
+management telnet
+   vrf mgmt
+      shutdown
+!
+management xmpp
+   vrf mgmt
+!

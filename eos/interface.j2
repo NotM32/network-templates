@@ -1,0 +1,4 @@
+interface {{ interface.name }}
+    {% if interface.description %}description {{interface.description}}{% endif %}
+    {% if interface.count_ipaddresses > 0 %}no switchport{% endif %}
+!
