@@ -25,7 +25,7 @@ vrf definition mgmt
     description mgmt
 !
 {% block interfaces %}
-{%- for interface in device.interfaces.all() -%}
+{%- for interface in device.interfaces.all() %}
 {% include 'eos/common/interface.j2' %}
 {%- endfor -%}
 {% endblock %}
