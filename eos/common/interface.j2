@@ -6,7 +6,7 @@ interface {{ interface.name }}
     {{ "no switchport" if interface.count_ipaddresses > 0 }}
     {{ "ipv6 enable" if interface.count_ipaddresses > 0 }}
     {% for ip in interface.ip_addresses.all() %}
-    ip{{ "v6" if ip.family == "v6" }} address {{ str(ip.address) }}
+    ip{{ "v6" if ip.family == "v6" }} address {{ ip.address }}
     {% endfor %}
 
 !{% endif %}
