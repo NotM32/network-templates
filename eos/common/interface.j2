@@ -1,14 +1,30 @@
-{%- if not interface.is_virtual or interface.is_lag -%}
 interface {{ interface.name }}
-    {{ "description %s" % interface.description if interface.description != '' }}
-    {{ "shutdown" if not interface.enabled }}
-    {{ "vrf forwarding %s" % interface.vrf.name if interface.vrf is not none }}
-    {{ "no switchport" if interface.count_ipaddresses > 0 }}
-    {{ "ipv6 enable" if interface.count_ipaddresses > 0 }}
+    {%- if interface.description %}
+	description {{ interface.description }}
+    {%- endif -%}
+	{%- if interface.enabled %}
+	shutdown
+	{%- endif -%}
+	{# Layer 3 #}
+	{%- if interface.count_ipaddresses > 0 %}
+	no switchport
+	{%- endif -%}
+	{%- if interface.vrf %}
+	vrf forwarding {{ interface.vrf.name }}
+	{%- endif -%}
     {%- for ip in interface.ip_addresses.all() %}
-    ip{{ "v6" if ip.family == 6 }} address {{ ip.address }}
-    {%- endfor %}
+    ip{{ "v6" if ip.family == 6 }} address {{ ip.address }} {{ "secondary" if loop.index > 1 and ip.family == 6 }}
+    {%- endfor -%}
+	{# Layer 2 #}
+	{%- if interface.mode == 'access' %}
+    switchport mode access
+	switchport access vlan {{ interface.untagged_vlan.vid }}
+	{%- elif interface.mode == 'tagged' %}
+	switchport mode trunk
+	switchport trunk allowed vlan {%- for vlan in interface.tagged_vlans.all() -%}{{vlan.vid}}{%- endfor %}
+	{%- endif -%}
+	{# Aggregate #}
     {%- if interface.lag is not none %}
     channel-group {{ interface.lag.label }} mode active
     {%- endif %}
-!{%- endif -%}
+!

@@ -7,7 +7,7 @@ ip domain-name coloradocolo.net
 {%- for server in ntp_servers %}
 ntp {{ server }}
 !
-{%- endfor -%}
+{% endfor -%}
 snmp-server community ***REMOVED*** ro SNMP
 !
 spanning-tree mode mstp
@@ -24,11 +24,11 @@ vrf definition mgmt
     rd 17139:17139
     description mgmt
 !
-{%- block interfaces -%}
+{% block interfaces -%}
 {%- for interface in device.interfaces.all() -%}
-{%- include 'eos/common/interface.j2' -%}
+{% include 'eos/common/interface.j2' %}
 {%- endfor -%}
-{% endblock -%}
+{%- endblock %}
 ip access-list standard SNMP
    10 permit host ***REMOVED***
    20 permit ***REMOVED***
