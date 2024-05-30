@@ -1,8 +1,8 @@
 interface {{ interface.name }}
     {%- if interface.description %}
 	description {{ interface.description }}
-    {%- endif -%}
-	{%- if interface.enabled %}
+	{%- endif -%}
+	{%- if not interface.enabled %}
 	shutdown
 	{%- endif -%}
 	{# Layer 3 #}
@@ -12,19 +12,24 @@ interface {{ interface.name }}
 	{%- if interface.vrf %}
 	vrf forwarding {{ interface.vrf.name }}
 	{%- endif -%}
-    {%- for ip in interface.ip_addresses.all() %}
-    ip{{ "v6" if ip.family == 6 }} address {{ ip.address }} {{ "secondary" if loop.index > 1 and ip.family == 4 }}
-    {%- endfor -%}
+	{%- for ip in interface.ip_addresses.all() %}
+	ip{{ "v6" if ip.family == 6 }} address {{ ip.address }} {{ "secondary" if loop.index > 1 and ip.family == 4 }}
+	{%- endfor -%}
 	{# Layer 2 #}
+	{%- if not interface.name.startswith('Vlan') -%}
 	{%- if interface.mode == 'access' %}
-    switchport mode access
+	switchport mode access
 	switchport access vlan {{ interface.untagged_vlan.vid }}
 	{%- elif interface.mode == 'tagged' %}
 	switchport mode trunk
 	switchport trunk allowed vlan {% for vlan in interface.tagged_vlans.all() -%}{{vlan.vid}}{{ ', ' if not loop.last }}{%- endfor %}
+	{%- if interface.untagged_vlan %}
+	switchport trunk native vlan {{ interface.untagged_vlan.vid }}
+	{%- endif -%}
+	{%- endif -%}
 	{%- endif -%}
 	{# Aggregate #}
-    {%- if interface.lag is not none %}
-    channel-group {{ interface.lag.label }} mode active
-    {%- endif %}
+	{%- if interface.lag is not none %}
+	channel-group {{ interface.lag.label }} mode active
+	{%- endif %}
 !
