@@ -1,0 +1,54 @@
+lldp management-address Management1
+lldp management-address vrf mgmt
+!
+snmp-server community ***REMOVED*** ro SNMP
+!
+aaa authorization exec default local
+!
+no aaa root
+!
+ip access-list standard SNMP
+	10 permit host ***REMOVED***
+	20 permit ***REMOVED***
+	30 permit host ***REMOVED***
+	40 permit host ***REMOVED***
+!
+ip access-list standard mgmt
+	10 permit 172.16.2.0/24
+	20 remark Office
+	30 permit 172.16.1.0/24
+	40 remark VPN Clients
+	50 permit host ***REMOVED***
+	60 remark Bastion/Firewall
+	70 permit ***REMOVED***
+	80 remark Infrastructure Servers
+	90 permit host ***REMOVED***
+	100 remark netbox
+	110 permit ***REMOVED***
+!
+management api http-commands
+	no shutdown
+	vrf mgmt
+		no shutdown
+!
+management console
+	idle-timeout 10
+!
+management security
+	entropy source hardware
+!
+management ssh
+	ip access-group mgmt vrf mgmt in
+	idle-timeout 10
+	login timeout 5
+	shutdown
+	vrf mgmt
+		no shutdown
+!
+management telnet
+	vrf mgmt
+		shutdown
+!
+management xmpp
+	vrf mgmt
+!
