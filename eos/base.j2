@@ -6,8 +6,8 @@ ip domain-name coloradocolo.net
 !
 {%- for server in ntp_servers %}
 ntp {{ server }}
-{%- endfor -%}
 !
+{%- endfor -%}
 snmp-server community ***REMOVED*** ro SNMP
 !
 spanning-tree mode mstp
@@ -21,14 +21,14 @@ no aaa root
 clock timezone US/Mountain
 !
 vrf definition mgmt
-    rd 100:100
+    rd 17139:17139
     description mgmt
 !
-{% block interfaces %}
-{%- for interface in device.interfaces.all() %}
-{% include 'eos/common/interface.j2' %}
+{%- block interfaces -%}
+{%- for interface in device.interfaces.all() -%}
+{%- include 'eos/common/interface.j2' -%}
 {%- endfor -%}
-{% endblock %}
+{% endblock -%}
 ip access-list standard SNMP
    10 permit host ***REMOVED***
    20 permit ***REMOVED***
@@ -46,16 +46,24 @@ ip access-list standard mgmt
    80 remark Infrastructure Servers
    90 permit host ***REMOVED***
    100 remark netbox
+   110 permit ***REMOVED***
 !
 management api http-commands
    no shutdown
    vrf mgmt
       no shutdown
 !
+management console
+   idle-timeout 10
+!
+management security
+   entropy source hardware
+!
 management ssh
    ip access-group mgmt vrf mgmt in
-   idle-timeout 30
-   login timeout 10
+   idle-timeout 10
+   login timeout 5
+   shutdown
    vrf mgmt
       no shutdown
 !
