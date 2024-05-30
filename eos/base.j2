@@ -25,9 +25,9 @@ vrf definition mgmt
     description mgmt
 !
 {% block interfaces -%}
-{%- for interface in device.interfaces.all() -%}
+{%- for interface in device.interfaces.all() %}
 {% include 'eos/common/interface.j2' %}
-{%- endfor -%}
+{% endfor -%}
 {%- endblock %}
 ip access-list standard SNMP
    10 permit host ***REMOVED***
