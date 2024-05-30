@@ -1,7 +1,7 @@
 hostname {{ device.name }}
 ip domain-name {{ domain_name if domain_name else 'coloradocolo.net' }}
 !
-{%- for server in ntp_servers %}
+{% for server in ntp_servers %}
 ntp {{ server }}
 !
 {%- endfor %}
@@ -11,14 +11,46 @@ service unsupported-transceiver EMC ***REMOVED***
 !
 clock timezone {{ timezone if timezone else 'US/Mountain' }}}
 !
-vrf definition mgmt
-	rd 17139:17139
-	description mgmt
+{% block vrfs %}
+{%- for vrf in device.interfaces.all()|map(attribute="vrf")|unique|list %}
+{%- if vrf is not none -%}
+vrf definition {{ vrf.name }}
+    {%- if vrf.rd %}
+	rd {{ vrf.rd }}
+	{%- endif -%}
+    {%- if vrf.description %}
+	description {{ vrf.description }}
+	{%- endif %}
 !
+{% endif -%}
+{%- endfor -%}
+{%- endblock -%}
+
+{%- block vlan_definitions %}
+{%- macro list_vlans(interfaces) -%}
+{%- set vlans = [] -%}
+{%- for interface in interfaces -%}
+  {%- for vlan in interface.tagged_vlans.all() -%}
+	{%- set _ = vlans.append(vlan) -%}
+  {%- endfor -%}
+  {%- set _ = vlans.append(interface.untagged_vlan) -%}
+{%- endfor -%}
+{%- if vlans|selectattr("name", "none")|map(attribute="vid")|list|unique|join(',')|length >= 1 %}
+vlan {{ vlans|selectattr("name", "none")|map(attribute="vid")|list|unique|join(',') }}
+{%- endif -%}
+{%- for vlan in vlans|selectattr("name", "defined")|unique|list %}
+vlan {{ vlan.vid }}
+	name {{ vlan.name }}
+!
+{%- endfor -%}
+{%- endmacro -%}
+{{ list_vlans(device.interfaces.all()) }}
+{%- endblock %}
+
 {% block interfaces -%}
 {%- for interface in device.interfaces.all() -%}
 {% include 'eos/common/interface.j2' %}
 {% endfor -%}
-{%- endblock %}
+{%- endblock -%}
 
 {% include 'eos/mgmt/base.j2' %}
