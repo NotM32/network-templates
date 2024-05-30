@@ -13,7 +13,7 @@ interface {{ interface.name }}
 	vrf forwarding {{ interface.vrf.name }}
 	{%- endif -%}
     {%- for ip in interface.ip_addresses.all() %}
-    ip{{ "v6" if ip.family == 6 }} address {{ ip.address }} {{ "secondary" if loop.index > 1 and ip.family == 6 }}
+    ip{{ "v6" if ip.family == 6 }} address {{ ip.address }} {{ "secondary" if loop.index > 1 and ip.family == 4 }}
     {%- endfor -%}
 	{# Layer 2 #}
 	{%- if interface.mode == 'access' %}

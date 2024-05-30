@@ -7,7 +7,7 @@ ip domain-name coloradocolo.net
 {%- for server in ntp_servers %}
 ntp {{ server }}
 !
-{% endfor -%}
+{%- endfor %}
 snmp-server community ***REMOVED*** ro SNMP
 !
 spanning-tree mode mstp
