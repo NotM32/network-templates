@@ -21,7 +21,7 @@ interface {{ interface.name }}
 	switchport access vlan {{ interface.untagged_vlan.vid }}
 	{%- elif interface.mode == 'tagged' %}
 	switchport mode trunk
-	switchport trunk allowed vlan {%- for vlan in interface.tagged_vlans.all() -%}{{vlan.vid}}{%- endfor %}
+	switchport trunk allowed vlan {% for vlan in interface.tagged_vlans.all() -%}{{vlan.vid}}{{ ', ' if not loop.last }}{%- endfor %}
 	{%- endif -%}
 	{# Aggregate #}
     {%- if interface.lag is not none %}
