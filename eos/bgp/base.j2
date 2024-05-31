@@ -1,0 +1,25 @@
+{%- set sessions = device.bgpsession_set.all() -%}
+{%- set prefix_lists = [] -%}
+{%- set route_maps = [] -%}
+{%- block setup -%}
+  {%- for session in sessions -%}
+	{# Peer prefix list filter #}
+	{%- set _ = prefix_lists.append(session.prefix_list_in) -%}
+	{%- set _ = prefix_lists.append(session.prefix_list_out) -%}
+	{# Route map and related #}
+	{%- for policy in session.import_policies.all()|list + session.export_policies.all()|list -%}
+	  {%- set _ = route_maps.append(policy) -%}
+	  {%- for rule in policy.rules.all() -%}
+		{%- set _ = prefix_lists.extend(rule.match_ip_address.all()) -%}
+		{%- set _ = prefix_lists.extend(rule.match_ipv6_address.all()) -%}
+	  {%- endfor -%}
+	{%- endfor -%}
+  {%- endfor -%}
+{%- endblock -%}
+{%- set prefix_lists = prefix_lists|unique|select|list -%}
+{%- set route_maps = route_maps|unique|select|list -%}
+{%- include 'eos/bgp/prefix-list.j2' %}
+{%- include 'eos/bgp/route-map.j2' %}
+router bgp 17139
+
+!

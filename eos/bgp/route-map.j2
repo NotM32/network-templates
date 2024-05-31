@@ -1,0 +1,23 @@
+{%- for route_map in route_maps -%}
+{%- for rule in route_map.rules.all() -%}
+route-map {{ route_map.name }} {{ rule.action }} {{ rule.index }}
+	{%- if rule.description -%}
+	description {{ rule.description }}
+	{%- endif %}
+	{%- for match, compare in rule.match_statements.items() %}
+	match {{ match }}
+	  {%- if match == 'ip address' or match == 'ipv6 address' %} prefix-list {{compare[0]}}
+	  {%- elif match == 'community' %} compare[0]
+	  {%- else %} {{compare}}
+	  {%- endif -%}
+	{%- endfor %}
+	{%- for set_attr, set_val in rule.set_statements.items() %}
+	{%- if set_attr == 'sub-route-map' -%}
+	{{ set_attr }} {{ set_val }}
+	{%- else -%}
+	set {{ set_attr }} {{ set_val }}
+	{%- endif -%}
+	{%- endfor %}
+!
+{% endfor %}
+{%- endfor -%}

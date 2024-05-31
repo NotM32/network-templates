@@ -47,10 +47,13 @@ vlan {{ vlan.vid }}
 {{ list_vlans(device.interfaces.all()) }}
 {%- endblock %}
 
+vxlan vni notation dotted
+
 {% block interfaces -%}
 {%- for interface in device.interfaces.all() -%}
 {% include 'eos/common/interface.j2' %}
 {% endfor -%}
 {%- endblock -%}
+
 
 {% include 'eos/mgmt/base.j2' %}

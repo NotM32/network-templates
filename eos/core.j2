@@ -1,0 +1,11 @@
+{% include 'eos/base.j2' %}
+
+{% include 'eos/bgp/base.j2' %}
+
+service routing protocols model multi-agent
+
+ip hardware fib optimize prefixes profile internet
+ipv6 hardware fib optimize prefixes profile internet
+
+ip fib compression redundant-specifics filter
+ipv6 fib compression redundant-specifics filter
