@@ -11,9 +11,9 @@ route-map {{ route_map.name }} {{ rule.action }} {{ rule.index }}
 	  {%- endif -%}
 	{%- endfor %}
 	{%- for set_attr, set_val in rule.set_statements.items() %}
-	{%- if set_attr == 'sub-route-map' -%}
+	{%- if set_attr == 'sub-route-map' %}
 	{{ set_attr }} {{ set_val }}
-	{%- else -%}
+	{%- else %}
 	set {{ set_attr }} {{ set_val }}
 	{%- endif -%}
 	{%- endfor %}
