@@ -1,3 +1,6 @@
+{%- if prefix_list_id -%}
+  {%- set prefix_list = bgp.PrefixList.objects.get(id=prefix_list_id) -%}
+{%- endif -%}
 ip{{'v6' if prefix_list.family == 'ipv6' }} prefix-list {{ prefix_list.name }}
 {%- for rule in prefix_list.prefrules.all() %}
   seq {{ rule.index }} {{rule.action}} {{ rule.prefix if rule.prefix else rule.prefix_custom }}
