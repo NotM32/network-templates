@@ -1,5 +1,6 @@
 {%- if device_id -%}
   {%- set device = dcim.Device.objects.get(id=device_id) -%}
+{%- endif -%}
 {%- set sessions = device.bgpsession_set.all() -%}
 {%- set prefix_lists = [] -%}
 {%- set route_maps = [] -%}
