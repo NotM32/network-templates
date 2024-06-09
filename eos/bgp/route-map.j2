@@ -1,4 +1,3 @@
-{%- for route_map in route_maps -%}
 {%- for rule in route_map.rules.all() -%}
 route-map {{ route_map.name }} {{ rule.action }} {{ rule.index }}
 	{%- if rule.description -%}
@@ -20,4 +19,3 @@ route-map {{ route_map.name }} {{ rule.action }} {{ rule.index }}
 	{%- endfor %}
 !
 {% endfor %}
-{%- endfor -%}
