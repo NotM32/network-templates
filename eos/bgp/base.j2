@@ -20,6 +20,7 @@
 {%- set route_maps = route_maps|unique|select|list -%}
 {%- include 'eos/bgp/prefix-list.j2' %}
 {%- include 'eos/bgp/route-map.j2' %}
+
 router bgp 17139
 
 !
