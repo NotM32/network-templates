@@ -1,10 +1,15 @@
+{%- set prefix_list_family = 'ipv4' if prefix_list_family is undefined else prefix_list_family -%}
 {%- if prefix_list_id -%}
   {%- set prefix_list = netbox_bgp.PrefixList.objects.get(id=prefix_list_id) -%}
 {%- elif prefix_list_name -%}
-  {%- set prefix_list = netbox_bgp.PrefixList.get(name=prefix_list_name, family=prefix_list_family) -%}
+  {%- set prefix_list = netbox_bgp.PrefixList.objects.get(name=prefix_list_name, family=prefix_list_family) -%}
 {%- endif -%}
+{%- if not omit_section -%}
 ip{{'v6' if prefix_list.family == 'ipv6' }} prefix-list {{ prefix_list.name }}
+{%- endif -%}
 {%- for rule in prefix_list.prefrules.all() %}
   seq {{ rule.index }} {{rule.action}} {{ rule.prefix if rule.prefix else rule.prefix_custom }}
 {%- endfor %}
+{%- if not omit_section -%}
 !
+{%- endif -%}
