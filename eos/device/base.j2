@@ -7,7 +7,7 @@ ntp {{ server }}
 {%- endfor %}
 spanning-tree mode {{ stp_mode if step_mode else 'mstp' }}
 !
-service unsupported-transceiver EMC ***REMOVED***
+service unsupported-transceiver EMC {{ global.eos_unsupported_transceiver_license }}
 !
 clock timezone {{ timezone if timezone else 'US/Mountain' }}}
 !
