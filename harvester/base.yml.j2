@@ -1,0 +1,73 @@
+scheme_version: 1
+token: {{ harvester.token }}
+server_url: https://{{ harvester.vip }}:443
+os:
+  password: password
+  ssh_authorized_keys:
+    - github:notm32
+  hostname: {{ device.name }}
+  modules:
+    - kvm
+    - nvme
+  sysctls:
+    kernel.printk: "4 4 1 7"
+    kernel.kptr_restrict: "1"
+  dns_nameservers:
+    {%- for nameserver in global.dns_servers %}
+    - {{ nameserver }}
+	{%- endfor %}
+  ntp_servers:
+    {%- for ntp_server in global.ntp_servers %}
+    - {{ ntp_server }}
+	{%- endfor %}
+  {%- if harvester|selectattr("labels", "defined") %}
+  labels:
+    {%- for label, value in harvester.labels.items() %}
+    {{ label }}: {{ value }}
+	{%- endfor %}
+  {%- endif %}
+install:
+  automatic: true
+  mode: join
+  management_interface:
+    interfaces:
+    {% for interface in device.interfaces.all()|selectattr("mac_address", "defined")|selectattr("count_ipaddresses", "gt", 0) -%}
+    - name: {{ interface.label }}
+      hwAddr: "{{ interface.mac_address }}"
+    {%- endfor %}
+    method: static
+    ip: {{ device.interfaces.get(("name", harvester.mgmt.interface)).ip_addresses.all()|selectattr("family", "equalto", 4)|first|attr("address")|attr("ip") }}
+    subnet_mask: {{ device.interfaces.get(("name", harvester.mgmt.interface)).ip_addresses.all()|selectattr("family", "equalto", 4)|first|attr("address")|attr("netmask") }}
+    gateway: {{ harvester.mgmt.gateway }}
+  force_efi: true
+  device: /dev/sda
+  data_disk: /dev/sda
+  persistent_partition_size: 2200Gi
+  silent: true
+  iso_url: https://releases.rancher.com/harvester/v1.3.1/harvester-v1.3.1-amd64.iso
+  poweroff: false
+  no_format: false
+  debug: true
+  skipchecks: true
+  tty: ttyS0
+  vip: {{ harvester.vip }}
+  vip_mode: {{ harvester.vip_mode }}
+  force_mbr: false
+  addons:
+    harvester_vm_import_controller:
+      enabled: false
+      values_content: ""
+    harvester_pcidevices_controller:
+      enabled: false
+      values_content: ""
+    rancher_monitoring:
+      enabled: true
+      values_content: ""
+    rancher_logging:
+      enabled: false
+      values_content: ""
+    harvester_seeder:
+      enabled: true
+      values_content: ""
+system_settings:
+  auto-disk-provision-paths: ""
